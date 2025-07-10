@@ -3,6 +3,7 @@ import {
   collection, doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc, onSnapshot
 } from 'firebase/firestore';
 
+
 let pessoas = {};
 let userId = null;
 let criterioOrdenacao = 'nome'; // 'nome' ou 'total'
