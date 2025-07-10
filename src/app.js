@@ -157,10 +157,11 @@ if (formLote) {
 
 async function salvarDados() {
   const pessoasRef = collection(db, `usuarios/${userId}/pessoas`);
-  for (const nome of Object.keys(pessoas)) {
-    await setDoc(doc(pessoasRef, nome), { registros: pessoas[nome] });
-  }
-  // Remover pessoas excluídas não é automático, mas pode ser feito se necessário
+  await Promise.all(
+    Object.keys(pessoas).map(nome =>
+      setDoc(doc(pessoasRef, nome), { registros: pessoas[nome] })
+    )
+  );
 }
 
 function showToast(msg, cor = '#6366f1') {
