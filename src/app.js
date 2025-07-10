@@ -64,6 +64,14 @@ const btnFecharModal = document.getElementById('fechar-modal-lote');
 if (btnAbrirModal && overlayModal && btnFecharModal) {
   btnAbrirModal.onclick = () => {
     atualizarCheckboxesModalLote();
+    // Habilita todos os checkboxes para seleção múltipla
+    const container = document.getElementById('checkboxes-pessoas-lote');
+    if (container) {
+      Array.from(container.querySelectorAll('input[type=checkbox]')).forEach(cb => {
+        cb.checked = false;
+        cb.disabled = false;
+      });
+    }
     overlayModal.style.display = 'flex';
   };
   btnFecharModal.onclick = () => {
@@ -223,7 +231,10 @@ function renderLista() {
     div.style.alignItems = 'center';
     const btn = document.createElement('button');
     btn.textContent = nome;
-    btn.onclick = () => mostrarDetalhes(nome);
+    btn.onclick = (e) => {
+      e.preventDefault();
+      abrirModalParaPessoa(nome);
+    };
     btn.style.flex = '1';
     btn.style.backgroundColor = '#007bff';
     btn.style.color = 'white';
@@ -257,6 +268,25 @@ function renderLista() {
     lista.parentNode.insertBefore(totalDiv, lista.nextSibling);
   }
   totalDiv.textContent = `Total geral de todos: R$ ${totalGeral.toFixed(2)}`;
+}
+
+// Função para abrir o modal para uma pessoa específica
+function abrirModalParaPessoa(nome) {
+  const overlayModal = document.getElementById('modal-lote-overlay');
+  const container = document.getElementById('checkboxes-pessoas-lote');
+  if (!overlayModal || !container) return;
+  atualizarCheckboxesModalLote();
+  // Marcar apenas a pessoa clicada e desabilitar os outros checkboxes
+  Array.from(container.querySelectorAll('input[type=checkbox]')).forEach(cb => {
+    if (cb.value === nome) {
+      cb.checked = true;
+      cb.disabled = true;
+    } else {
+      cb.checked = false;
+      cb.disabled = true;
+    }
+  });
+  overlayModal.style.display = 'flex';
 }
 
 function mostrarDetalhes(nome) {
