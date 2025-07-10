@@ -22,7 +22,57 @@ export function iniciarApp(uid) {
       pessoas[docSnap.id] = docSnap.data().registros || [];
     }
     renderLista();
+    atualizarFormLote(); // Atualiza o select do formulário de lote
   });
+  // Exibe o formulário de lote ao logar
+  document.getElementById('form-lote').style.display = 'block';
+}
+
+function atualizarFormLote() {
+  const select = document.getElementById('select-pessoas-lote');
+  if (!select) return;
+  select.innerHTML = '';
+  Object.keys(pessoas).forEach(nome => {
+    const opt = document.createElement('option');
+    opt.value = nome;
+    opt.textContent = nome;
+    select.appendChild(opt);
+  });
+}
+
+const formLote = document.getElementById('form-lote');
+if (formLote) {
+  formLote.onsubmit = async (e) => {
+    e.preventDefault();
+    const valor = document.getElementById('valor-lote').value;
+    const descricao = document.getElementById('descricao-lote').value;
+    const naoContabilizar = document.getElementById('naoContabilizar-lote').checked;
+    const select = document.getElementById('select-pessoas-lote');
+    const selecionados = Array.from(select.selectedOptions).map(opt => opt.value);
+    if (!valor || Number(valor) <= 0) {
+      showToast('Valor deve ser maior que zero!','#b91c1c');
+      return;
+    }
+    if (!descricao.trim()) {
+      showToast('Descrição não pode ser vazia!','#b91c1c');
+      return;
+    }
+    if (selecionados.length === 0) {
+      showToast('Selecione pelo menos uma pessoa!','#b91c1c');
+      return;
+    }
+    for (const nome of selecionados) {
+      pessoas[nome].push({ valor, descricao, naoContabilizar });
+    }
+    await salvarDados();
+    showToast('Registro adicionado para selecionados!','green');
+    // Limpa o formulário
+    document.getElementById('valor-lote').value = '';
+    document.getElementById('descricao-lote').value = '';
+    document.getElementById('naoContabilizar-lote').checked = false;
+    select.selectedIndex = -1;
+    renderLista();
+  };
 }
 
 async function salvarDados() {
