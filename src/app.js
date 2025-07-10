@@ -80,7 +80,7 @@ if (formLoteModal) {
     e.preventDefault();
     const valor = document.getElementById('valor-lote-modal').value;
     const descricao = document.getElementById('descricao-lote-modal').value;
-    const naoContabilizar = document.getElementById('naoContabilizar-lote-modal').checked;
+    const naoContabilizar = !!document.getElementById('naoContabilizar-lote-modal').checked;
     const container = document.getElementById('checkboxes-pessoas-lote');
     const selecionados = Array.from(container.querySelectorAll('input[type=checkbox]:checked')).map(cb => cb.value);
     if (!valor || Number(valor) <= 0) {
@@ -96,6 +96,7 @@ if (formLoteModal) {
       return;
     }
     for (const nome of selecionados) {
+      // Adiciona uma cópia independente do registro para cada pessoa
       pessoas[nome].push({ valor, descricao, naoContabilizar });
     }
     await salvarDados();
