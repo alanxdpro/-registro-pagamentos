@@ -143,6 +143,10 @@ function mostrarDetalhes(nome) {
     <button class='btn-imprimir' onclick="imprimirPessoa('${nome}')">Imprimir ${nome}</button>
     <div id="registros"></div>`;
   renderRegistros(nome);
+  // Scroll automático para o formulário de detalhes
+  setTimeout(() => {
+    container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 100);
 }
 
 window.editarNomePessoa = async (nomeAntigo) => {
