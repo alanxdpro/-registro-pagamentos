@@ -32,10 +32,20 @@
           </div>
           <div style="margin-bottom:18px;">
             <div style="font-weight:bold; margin-bottom:6px; color:#374151;">Selecione as pessoas:</div>
-            <div id="checkboxes-pessoas-lote" style="display:flex; flex-direction:column; gap:7px; max-height:180px; overflow-y:auto; border:1px solid #e5e7eb; border-radius:7px; padding:10px 8px; background:#f9fafb;"></div>
+            <div id="checkboxes-pessoas-lote" style="display:grid; grid-template-columns: 1fr 1fr; gap:7px; max-height:180px; overflow-y:auto; border:1px solid #e5e7eb; border-radius:7px; padding:10px 8px; background:#f9fafb; font-size:0.93em;"></div>
           </div>
           <button type="submit" style="padding:10px 22px; background:#6366f1; color:white; border:none; border-radius:8px; font-size:1.05em; font-weight:bold; cursor:pointer; box-shadow:0 1px 4px #0001; transition:background 0.2s;">Adicionar para selecionados</button>
         </form>
+      </div>
+    </div>
+    <!-- Modal de detalhes da pessoa -->
+    <div id="modal-detalhes-overlay" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:#0007; z-index:10001; justify-content:center; align-items:center;">
+      <div id="modal-detalhes" style="background:#fff; border-radius:14px; box-shadow:0 4px 32px #0003; padding:32px 28px 24px 28px; min-width:320px; max-width:96vw; max-height:90vh; overflow-y:auto; position:relative;">
+        <button id="fechar-modal-detalhes" style="position:absolute; top:12px; right:12px; background:transparent; border:none; font-size:1.5em; color:#6366f1; cursor:pointer;">&times;</button>
+        <h2 id="modal-detalhes-nome" style="margin-top:0; margin-bottom:18px; color:#6366f1; font-size:1.25em;"></h2>
+        <div id="modal-detalhes-total" style="font-weight:bold; color:#047857; margin-bottom:12px;"></div>
+        <div id="modal-detalhes-registros" style="margin-bottom:18px;"></div>
+        <button id="modal-detalhes-imprimir" style="padding:8px 18px; background:#6366f1; color:white; border:none; border-radius:8px; font-size:1em; font-weight:bold; cursor:pointer; box-shadow:0 1px 4px #0001; transition:background 0.2s;">Imprimir</button>
       </div>
     </div>
     <div class="input-area" id="app" style="display: none;">
