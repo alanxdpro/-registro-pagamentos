@@ -9,6 +9,18 @@
     <button id="login-button">Login com Google</button>
     <button id="logout-button" style="display: none;">Logout</button>
     <h1>Registro de Pagamentos</h1>
+    <!-- Formulário de registro em lote -->
+    <form id="form-lote" style="display:none; margin-bottom: 20px; background: #f3f4f6; padding: 12px; border-radius: 8px;">
+      <label>Valor: <input type="number" id="valor-lote" required style="width:90px;" /></label>
+      <label>Descrição: <input type="text" id="descricao-lote" required style="width:180px;" /></label>
+      <label style="display:inline-flex;align-items:center;gap:4px;font-size:0.98em;">
+        <input type="checkbox" id="naoContabilizar-lote" /> Não somar este valor no total
+      </label>
+      <label>Pessoas:
+        <select id="select-pessoas-lote" multiple size="3" style="min-width:120px;max-width:220px;"></select>
+      </label>
+      <button type="submit">Adicionar para selecionados</button>
+    </form>
     <div class="input-area" id="app" style="display: none;">
       <input type="text" id="nomeInput" placeholder="Nome da pessoa" />
       <button onclick="adicionarPessoa()">Adicionar Pessoa</button>
