@@ -103,10 +103,10 @@ if (formLoteModal) {
       showToast('Selecione pelo menos uma pessoa!','#b91c1c');
       return;
     }
-    for (const nome of selecionados) {
-      // Adiciona uma cópia independente do registro para cada pessoa
-      pessoas[nome].push({ valor, descricao, naoContabilizar });
-    }
+    // Adiciona o registro para cada pessoa selecionada, garantindo cópia independente
+    selecionados.forEach(nome => {
+      pessoas[nome] = [...(pessoas[nome] || []), { valor, descricao, naoContabilizar }];
+    });
     await salvarDados();
     showToast('Registro adicionado para selecionados!','green');
     // Limpa o formulário
