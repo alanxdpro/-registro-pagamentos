@@ -194,6 +194,9 @@ window.adicionarPessoa = async () => {
 function renderLista() {
   const lista = document.getElementById('pessoas-lista');
   lista.innerHTML = '';
+  lista.style.display = 'grid';
+  lista.style.gridTemplateColumns = '1fr 1fr';
+  lista.style.gap = '10px';
   let totalGeral = 0;
   let nomes = Object.keys(pessoas);
   // Filtro de busca
@@ -216,18 +219,28 @@ function renderLista() {
     totalGeral += pessoaTotal;
     const div = document.createElement('div');
     div.style.display = 'flex';
-    div.style.gap = '10px';
+    div.style.gap = '7px';
+    div.style.alignItems = 'center';
     const btn = document.createElement('button');
     btn.textContent = nome;
     btn.onclick = () => mostrarDetalhes(nome);
     btn.style.flex = '1';
     btn.style.backgroundColor = '#007bff';
     btn.style.color = 'white';
+    btn.style.fontSize = '0.97em';
+    btn.style.padding = '7px 6px';
+    btn.style.borderRadius = '6px';
+    btn.style.overflow = 'hidden';
+    btn.style.textOverflow = 'ellipsis';
+    btn.style.whiteSpace = 'nowrap';
+    btn.style.maxWidth = '100%';
     const excluir = document.createElement('button');
     excluir.textContent = '🗑️';
     excluir.onclick = () => excluirPessoa(nome);
     excluir.style.backgroundColor = 'red';
     excluir.style.color = 'white';
+    excluir.style.fontSize = '0.97em';
+    excluir.style.borderRadius = '6px';
     div.appendChild(btn);
     div.appendChild(excluir);
     lista.appendChild(div);
