@@ -44,6 +44,14 @@
         <button id="fechar-modal-detalhes" style="position:absolute; top:12px; right:12px; background:transparent; border:none; font-size:1.5em; color:#6366f1; cursor:pointer;">&times;</button>
         <h2 id="modal-detalhes-nome" style="margin-top:0; margin-bottom:18px; color:#6366f1; font-size:1.25em;"></h2>
         <div id="modal-detalhes-total" style="font-weight:bold; color:#047857; margin-bottom:12px;"></div>
+        <form id="modal-detalhes-form" style="display:flex; flex-wrap:wrap; gap:12px; align-items:center; margin-bottom:16px;">
+          <input type="number" id="modal-detalhes-valor" placeholder="Valor" required style="width:90px; padding:6px 8px; border-radius:6px; border:1px solid #d1d5db; font-size:1em;" />
+          <input type="text" id="modal-detalhes-descricao" placeholder="Descrição" required style="width:160px; padding:6px 8px; border-radius:6px; border:1px solid #d1d5db; font-size:1em;" />
+          <label style="display:inline-flex;align-items:center;gap:4px;font-size:0.98em;">
+            <input type="checkbox" id="modal-detalhes-naoContabilizar" /> Não somar
+          </label>
+          <button type="submit" style="padding:7px 16px; background:#6366f1; color:white; border:none; border-radius:8px; font-size:1em; font-weight:bold; cursor:pointer;">Adicionar</button>
+        </form>
         <div id="modal-detalhes-registros" style="margin-bottom:18px;"></div>
         <button id="modal-detalhes-imprimir" style="padding:8px 18px; background:#6366f1; color:white; border:none; border-radius:8px; font-size:1em; font-weight:bold; cursor:pointer; box-shadow:0 1px 4px #0001; transition:background 0.2s;">Imprimir</button>
       </div>
