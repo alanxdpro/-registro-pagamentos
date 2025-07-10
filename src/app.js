@@ -22,7 +22,7 @@ export function iniciarApp(uid) {
       pessoas[docSnap.id] = docSnap.data().registros || [];
     }
     renderLista();
-    atualizarFormLote(); // Atualiza o select do formulário de lote
+    atualizarCheckboxesModalLote(); // Atualiza checkboxes do modal
   });
   // Exibe o formulário de lote ao logar
   document.getElementById('form-lote').style.display = 'block';
@@ -38,6 +38,76 @@ function atualizarFormLote() {
     opt.textContent = nome;
     select.appendChild(opt);
   });
+}
+
+// --- Modal de registro em lote ---
+function atualizarCheckboxesModalLote() {
+  const container = document.getElementById('checkboxes-pessoas-lote');
+  if (!container) return;
+  container.innerHTML = '';
+  Object.keys(pessoas).forEach(nome => {
+    const id = 'check-lote-' + nome.replace(/[^a-zA-Z0-9]/g, '_');
+    const label = document.createElement('label');
+    label.style.display = 'flex';
+    label.style.alignItems = 'center';
+    label.style.gap = '7px';
+    label.style.fontSize = '1em';
+    label.innerHTML = `<input type="checkbox" id="${id}" value="${nome}" style="transform:scale(1.1);" /> ${nome}`;
+    container.appendChild(label);
+  });
+}
+
+// Abrir/fechar modal
+const btnAbrirModal = document.getElementById('abrir-modal-lote');
+const overlayModal = document.getElementById('modal-lote-overlay');
+const btnFecharModal = document.getElementById('fechar-modal-lote');
+if (btnAbrirModal && overlayModal && btnFecharModal) {
+  btnAbrirModal.onclick = () => {
+    atualizarCheckboxesModalLote();
+    overlayModal.style.display = 'flex';
+  };
+  btnFecharModal.onclick = () => {
+    overlayModal.style.display = 'none';
+  };
+  overlayModal.onclick = (e) => {
+    if (e.target === overlayModal) overlayModal.style.display = 'none';
+  };
+}
+
+const formLoteModal = document.getElementById('form-lote-modal');
+if (formLoteModal) {
+  formLoteModal.onsubmit = async (e) => {
+    e.preventDefault();
+    const valor = document.getElementById('valor-lote-modal').value;
+    const descricao = document.getElementById('descricao-lote-modal').value;
+    const naoContabilizar = document.getElementById('naoContabilizar-lote-modal').checked;
+    const container = document.getElementById('checkboxes-pessoas-lote');
+    const selecionados = Array.from(container.querySelectorAll('input[type=checkbox]:checked')).map(cb => cb.value);
+    if (!valor || Number(valor) <= 0) {
+      showToast('Valor deve ser maior que zero!','#b91c1c');
+      return;
+    }
+    if (!descricao.trim()) {
+      showToast('Descrição não pode ser vazia!','#b91c1c');
+      return;
+    }
+    if (selecionados.length === 0) {
+      showToast('Selecione pelo menos uma pessoa!','#b91c1c');
+      return;
+    }
+    for (const nome of selecionados) {
+      pessoas[nome].push({ valor, descricao, naoContabilizar });
+    }
+    await salvarDados();
+    showToast('Registro adicionado para selecionados!','green');
+    // Limpa o formulário
+    document.getElementById('valor-lote-modal').value = '';
+    document.getElementById('descricao-lote-modal').value = '';
+    document.getElementById('naoContabilizar-lote-modal').checked = false;
+    atualizarCheckboxesModalLote();
+    overlayModal.style.display = 'none';
+    renderLista();
+  };
 }
 
 const formLote = document.getElementById('form-lote');
