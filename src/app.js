@@ -108,6 +108,8 @@ if (formLoteModal) {
       pessoas[nome] = [...(pessoas[nome] || []), { valor, descricao, naoContabilizar }];
     });
     await salvarDados();
+    // Atualiza a lista local imediatamente após salvar
+    renderLista();
     showToast('Registro adicionado para selecionados!','green');
     // Limpa o formulário
     document.getElementById('valor-lote-modal').value = '';
@@ -115,7 +117,6 @@ if (formLoteModal) {
     document.getElementById('naoContabilizar-lote-modal').checked = false;
     atualizarCheckboxesModalLote();
     overlayModal.style.display = 'none';
-    renderLista();
   };
 }
 
