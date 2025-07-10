@@ -3,7 +3,6 @@ import {
   collection, doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc, onSnapshot
 } from 'firebase/firestore';
 
-
 let pessoas = {};
 let userId = null;
 let criterioOrdenacao = 'nome'; // 'nome' ou 'total'
@@ -234,7 +233,7 @@ function renderLista() {
     btn.textContent = nome;
     btn.onclick = (e) => {
       e.preventDefault();
-      abrirModalParaPessoa(nome);
+      abrirModalDetalhesPessoa(nome);
     };
     btn.style.flex = '1';
     btn.style.backgroundColor = '#007bff';
@@ -271,23 +270,36 @@ function renderLista() {
   totalDiv.textContent = `Total geral de todos: R$ ${totalGeral.toFixed(2)}`;
 }
 
-// Função para abrir o modal para uma pessoa específica
-function abrirModalParaPessoa(nome) {
-  const overlayModal = document.getElementById('modal-lote-overlay');
-  const container = document.getElementById('checkboxes-pessoas-lote');
-  if (!overlayModal || !container) return;
-  atualizarCheckboxesModalLote();
-  // Marcar apenas a pessoa clicada e desabilitar os outros checkboxes
-  Array.from(container.querySelectorAll('input[type=checkbox]')).forEach(cb => {
-    if (cb.value === nome) {
-      cb.checked = true;
-      cb.disabled = true;
-    } else {
-      cb.checked = false;
-      cb.disabled = true;
-    }
-  });
-  overlayModal.style.display = 'flex';
+// Modal de detalhes da pessoa
+function abrirModalDetalhesPessoa(nome) {
+  const overlay = document.getElementById('modal-detalhes-overlay');
+  const nomeEl = document.getElementById('modal-detalhes-nome');
+  const totalEl = document.getElementById('modal-detalhes-total');
+  const registrosEl = document.getElementById('modal-detalhes-registros');
+  const btnImprimir = document.getElementById('modal-detalhes-imprimir');
+  if (!overlay || !nomeEl || !totalEl || !registrosEl || !btnImprimir) return;
+  nomeEl.textContent = nome;
+  // Calcular total
+  const total = pessoas[nome].reduce((acc, r) => acc + (!r.naoContabilizar ? Number(r.valor) : 0), 0);
+  totalEl.textContent = `Total: R$ ${total.toFixed(2)}`;
+  // Listar registros
+  if (pessoas[nome].length === 0) {
+    registrosEl.innerHTML = '<div style="color:#888">Nenhum registro.</div>';
+  } else {
+    registrosEl.innerHTML = pessoas[nome].map((r, i) =>
+      `<div style='margin-bottom:7px; font-size:0.98em;'><b>${i+1}.</b> R$ ${r.valor} - ${r.descricao} ${r.naoContabilizar ? "<span style='color:#b91c1c;font-size:0.95em'>(não soma)</span>" : ''}</div>`
+    ).join('');
+  }
+  btnImprimir.onclick = () => imprimirPessoa(nome);
+  overlay.style.display = 'flex';
+}
+
+// Fechar modal de detalhes
+const overlayDetalhes = document.getElementById('modal-detalhes-overlay');
+const btnFecharDetalhes = document.getElementById('fechar-modal-detalhes');
+if (overlayDetalhes && btnFecharDetalhes) {
+  btnFecharDetalhes.onclick = () => { overlayDetalhes.style.display = 'none'; };
+  overlayDetalhes.onclick = (e) => { if (e.target === overlayDetalhes) overlayDetalhes.style.display = 'none'; };
 }
 
 function mostrarDetalhes(nome) {
