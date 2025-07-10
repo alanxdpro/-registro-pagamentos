@@ -1,59 +1,33 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Registro de Pagamentos</title>
-  </head>
-  <body>
-    <button id="login-button">Login com Google</button>
-    <button id="logout-button" style="display: none;">Logout</button>
-    <h1>Registro de Pagamentos</h1>
-    <!-- Botão para abrir o modal de lote -->
-    <button id="abrir-modal-lote" style="margin-bottom: 18px; padding:10px 22px; background:#6366f1; color:white; border:none; border-radius:8px; font-size:1.05em; font-weight:bold; cursor:pointer; box-shadow:0 1px 4px #0001; transition:background 0.2s;">Adicionar registro em lote</button>
-    <!-- Modal de registro em lote -->
-    <div id="modal-lote-overlay" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:#0007; z-index:10000; justify-content:center; align-items:center;">
-      <div id="modal-lote" style="background:#fff; border-radius:14px; box-shadow:0 4px 32px #0003; padding:32px 28px 24px 28px; min-width:320px; max-width:96vw; max-height:90vh; overflow-y:auto; position:relative;">
-        <button id="fechar-modal-lote" style="position:absolute; top:12px; right:12px; background:transparent; border:none; font-size:1.5em; color:#6366f1; cursor:pointer;">&times;</button>
-        <h2 style="margin-top:0; margin-bottom:18px; color:#6366f1; font-size:1.25em;">Adicionar registro em lote</h2>
-        <form id="form-lote-modal" autocomplete="off">
-          <div style="display:flex; flex-wrap:wrap; gap:18px; align-items:center; margin-bottom:18px;">
-            <label style="display:flex; flex-direction:column; font-size:0.98em; gap:4px; min-width:110px;">
-              Valor:
-              <input type="number" id="valor-lote-modal" required style="width:110px; padding:6px 8px; border-radius:6px; border:1px solid #d1d5db; font-size:1em;" />
-            </label>
-            <label style="display:flex; flex-direction:column; font-size:0.98em; gap:4px; min-width:180px;">
-              Descrição:
-              <input type="text" id="descricao-lote-modal" required style="width:180px; padding:6px 8px; border-radius:6px; border:1px solid #d1d5db; font-size:1em;" />
-            </label>
-            <label style="display:flex; align-items:center; gap:6px; font-size:0.98em; min-width:170px; margin-top:18px;">
-              <input type="checkbox" id="naoContabilizar-lote-modal" style="transform:scale(1.2);" /> Não somar no total
-            </label>
-          </div>
-          <div style="margin-bottom:18px;">
-            <div style="font-weight:bold; margin-bottom:6px; color:#374151;">Selecione as pessoas:</div>
-            <div id="checkboxes-pessoas-lote" style="display:grid; grid-template-columns: 1fr 1fr; gap:7px; max-height:180px; overflow-y:auto; border:1px solid #e5e7eb; border-radius:7px; padding:10px 8px; background:#f9fafb; font-size:0.93em;"></div>
-          </div>
-          <button type="submit" style="padding:10px 22px; background:#6366f1; color:white; border:none; border-radius:8px; font-size:1.05em; font-weight:bold; cursor:pointer; box-shadow:0 1px 4px #0001; transition:background 0.2s;">Adicionar para selecionados</button>
-        </form>
-      </div>
-    </div>
-    <div class="input-area" id="app" style="display: none;">
-      <input type="text" id="nomeInput" placeholder="Nome da pessoa" />
-      <button onclick="adicionarPessoa()">Adicionar Pessoa</button>
-      <button class="btn-imprimir" onclick="imprimirTodos()">Imprimir Todos</button>
-    </div>
-    <div class="input-area" id="desfazer-area" style="display: none; justify-content: flex-end;">
-      <button onclick="desfazerUltimaAcao()">Desfazer última ação</button>
-    </div>
-    <div class="input-area" id="filtros" style="display: none;">
-      <input type="text" id="buscaInput" placeholder="Buscar pessoa..." oninput="setBusca()" style="min-width:180px;" />
-      <button onclick="setOrdenacao('nome')">Ordenar por Nome</button>
-      <button onclick="setOrdenacao('total')">Ordenar por Total</button>
-    </div>
-    <div id="pessoas-lista"></div>
-    <div id="detalhes"></div>
-    <div id="toast-container" style="position: fixed; top: 20px; right: 20px; z-index: 9999;"></div>
-    <script type="module" src="/src/main.js"></script>
-  </body>
-</html>
+import './style.css';
+import { auth, provider } from './firebase';
+import {
+  signInWithPopup,
+  signOut,
+  onAuthStateChanged
+} from "firebase/auth";
+import { iniciarApp } from './app';
+
+const loginBtn = document.getElementById("login-button");
+const logoutBtn = document.getElementById("logout-button");
+const appDiv = document.getElementById("app");
+const filtrosDiv = document.getElementById("filtros");
+const desfazerDiv = document.getElementById("desfazer-area");
+
+const EMAIL_PERMITIDO = 'psxdpro@gmail.com'; // <-- coloque seu e-mail aqui
+
+loginBtn.onclick = () => signInWithPopup(auth, provider);
+logoutBtn.onclick = () => signOut(auth);
+
+onAuthStateChanged(auth, (user) => {
+  if (user && user.email !== EMAIL_PERMITIDO) {
+    alert('Acesso não autorizado.');
+    signOut(auth);
+    return;
+  }
+  loginBtn.style.display = user ? "none" : "inline-block";
+  logoutBtn.style.display = user ? "inline-block" : "none";
+  appDiv.style.display = user ? "block" : "none";
+  filtrosDiv.style.display = user ? "flex" : "none";
+  desfazerDiv.style.display = user ? "flex" : "none";
+  if (user) iniciarApp(user.uid);
+});
