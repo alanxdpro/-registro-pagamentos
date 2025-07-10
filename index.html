@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Registro de Pagamentos</title>
+  </head>
+  <body>
+    <button id="login-button">Login com Google</button>
+    <button id="logout-button" style="display: none;">Logout</button>
+    <h1>Registro de Pagamentos</h1>
+    <div class="input-area" id="app" style="display: none;">
+      <input type="text" id="nomeInput" placeholder="Nome da pessoa" />
+      <button onclick="adicionarPessoa()">Adicionar Pessoa</button>
+      <button class="btn-imprimir" onclick="imprimirTodos()">Imprimir Todos</button>
+    </div>
+    <div class="input-area" id="desfazer-area" style="display: none; justify-content: flex-end;">
+      <button onclick="desfazerUltimaAcao()">Desfazer última ação</button>
+    </div>
+    <div class="input-area" id="filtros" style="display: none;">
+      <input type="text" id="buscaInput" placeholder="Buscar pessoa..." oninput="setBusca()" style="min-width:180px;" />
+      <button onclick="setOrdenacao('nome')">Ordenar por Nome</button>
+      <button onclick="setOrdenacao('total')">Ordenar por Total</button>
+    </div>
+    <div id="pessoas-lista"></div>
+    <div id="detalhes"></div>
+    <div id="toast-container" style="position: fixed; top: 20px; right: 20px; z-index: 9999;"></div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
