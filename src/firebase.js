@@ -15,7 +15,7 @@ const firebaseConfig = {
   measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
   databaseURL: "https://apptesorariadbvnetlify-default-rtdb.firebaseio.com/"
 };
-// Your web app's Firebase configuration
+// Your web app's Firebase configuration sem aspa
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 
 
