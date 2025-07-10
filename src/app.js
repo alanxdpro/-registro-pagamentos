@@ -271,7 +271,9 @@ function renderLista() {
 }
 
 // Modal de detalhes da pessoa
+let pessoaModalAberta = null;
 function abrirModalDetalhesPessoa(nome) {
+  pessoaModalAberta = nome;
   const overlay = document.getElementById('modal-detalhes-overlay');
   const nomeEl = document.getElementById('modal-detalhes-nome');
   const totalEl = document.getElementById('modal-detalhes-total');
@@ -279,6 +281,16 @@ function abrirModalDetalhesPessoa(nome) {
   const btnImprimir = document.getElementById('modal-detalhes-imprimir');
   if (!overlay || !nomeEl || !totalEl || !registrosEl || !btnImprimir) return;
   nomeEl.textContent = nome;
+  atualizarModalDetalhesRegistros();
+  btnImprimir.onclick = () => imprimirPessoa(nome);
+  overlay.style.display = 'flex';
+}
+
+function atualizarModalDetalhesRegistros() {
+  const nome = pessoaModalAberta;
+  const totalEl = document.getElementById('modal-detalhes-total');
+  const registrosEl = document.getElementById('modal-detalhes-registros');
+  if (!nome || !totalEl || !registrosEl) return;
   // Calcular total
   const total = pessoas[nome].reduce((acc, r) => acc + (!r.naoContabilizar ? Number(r.valor) : 0), 0);
   totalEl.textContent = `Total: R$ ${total.toFixed(2)}`;
@@ -287,11 +299,50 @@ function abrirModalDetalhesPessoa(nome) {
     registrosEl.innerHTML = '<div style="color:#888">Nenhum registro.</div>';
   } else {
     registrosEl.innerHTML = pessoas[nome].map((r, i) =>
-      `<div style='margin-bottom:7px; font-size:0.98em;'><b>${i+1}.</b> R$ ${r.valor} - ${r.descricao} ${r.naoContabilizar ? "<span style='color:#b91c1c;font-size:0.95em'>(não soma)</span>" : ''}</div>`
+      `<div style='margin-bottom:7px; font-size:0.98em; display:flex; align-items:center; gap:8px;'>
+        <span id='modal-registro-texto-${i}' style='flex:1;'>
+          <b>${i+1}.</b> R$ ${r.valor} - ${r.descricao} ${r.naoContabilizar ? "<span style='color:#b91c1c;font-size:0.95em'>(não soma)</span>" : ''}
+        </span>
+        <button class='modal-btn-editar' data-idx='${i}' style='background:#fbbf24; color:#333; border:none; border-radius:5px; padding:2px 7px; font-size:0.98em; cursor:pointer;'>✏️</button>
+        <button class='modal-btn-excluir' data-idx='${i}' style='background:#ef4444; color:white; border:none; border-radius:5px; padding:2px 7px; font-size:0.98em; cursor:pointer;'>❌</button>
+      </div>`
     ).join('');
+    // Adicionar listeners para editar/excluir
+    Array.from(registrosEl.querySelectorAll('.modal-btn-editar')).forEach(btn => {
+      btn.onclick = () => editarRegistroModal(nome, Number(btn.getAttribute('data-idx')));
+    });
+    Array.from(registrosEl.querySelectorAll('.modal-btn-excluir')).forEach(btn => {
+      btn.onclick = () => excluirRegistroModal(nome, Number(btn.getAttribute('data-idx')));
+    });
   }
-  btnImprimir.onclick = () => imprimirPessoa(nome);
-  overlay.style.display = 'flex';
+}
+
+// Adicionar novo registro pelo formulário do modal
+const formDetalhes = document.getElementById('modal-detalhes-form');
+if (formDetalhes) {
+  formDetalhes.onsubmit = async (e) => {
+    e.preventDefault();
+    const nome = pessoaModalAberta;
+    const valor = document.getElementById('modal-detalhes-valor').value;
+    const descricao = document.getElementById('modal-detalhes-descricao').value;
+    const naoContabilizar = document.getElementById('modal-detalhes-naoContabilizar').checked;
+    if (!valor || Number(valor) <= 0) {
+      showToast('Valor deve ser maior que zero!','#b91c1c');
+      return;
+    }
+    if (!descricao.trim()) {
+      showToast('Descrição não pode ser vazia!','#b91c1c');
+      return;
+    }
+    pessoas[nome].push({ valor, descricao, naoContabilizar });
+    await salvarDados();
+    document.getElementById('modal-detalhes-valor').value = '';
+    document.getElementById('modal-detalhes-descricao').value = '';
+    document.getElementById('modal-detalhes-naoContabilizar').checked = false;
+    atualizarModalDetalhesRegistros();
+    renderLista();
+    showToast('Registro adicionado!','green');
+  };
 }
 
 // Fechar modal de detalhes
@@ -509,3 +560,47 @@ window.desfazerUltimaAcao = async () => {
     showToast('Nome restaurado!','green');
   }
 };
+
+// Editar registro inline
+function editarRegistroModal(nome, idx) {
+  const registrosEl = document.getElementById('modal-detalhes-registros');
+  const r = pessoas[nome][idx];
+  const span = document.getElementById(`modal-registro-texto-${idx}`);
+  if (!span) return;
+  span.innerHTML = `
+    <input id='edit-valor' type='number' value='${r.valor}' style='width:70px; padding:2px 4px; border-radius:4px; border:1px solid #d1d5db; font-size:0.97em;' />
+    <input id='edit-descricao' type='text' value='${r.descricao}' style='width:120px; padding:2px 4px; border-radius:4px; border:1px solid #d1d5db; font-size:0.97em;' />
+    <label style='font-size:0.97em; margin-left:4px;'><input id='edit-naoContabilizar' type='checkbox' ${r.naoContabilizar ? 'checked' : ''}/> Não somar</label>
+    <button id='salvar-edit' style='background:#22c55e; color:white; border:none; border-radius:5px; padding:2px 7px; font-size:0.98em; margin-left:4px; cursor:pointer;'>Salvar</button>
+    <button id='cancelar-edit' style='background:#e5e7eb; color:#333; border:none; border-radius:5px; padding:2px 7px; font-size:0.98em; margin-left:2px; cursor:pointer;'>Cancelar</button>
+  `;
+  document.getElementById('salvar-edit').onclick = async () => {
+    const novoValor = document.getElementById('edit-valor').value;
+    const novaDescricao = document.getElementById('edit-descricao').value;
+    const novoNaoContabilizar = document.getElementById('edit-naoContabilizar').checked;
+    if (!novoValor || Number(novoValor) <= 0) {
+      showToast('Valor deve ser maior que zero!','#b91c1c');
+      return;
+    }
+    if (!novaDescricao.trim()) {
+      showToast('Descrição não pode ser vazia!','#b91c1c');
+      return;
+    }
+    pessoas[nome][idx] = { valor: novoValor, descricao: novaDescricao, naoContabilizar: novoNaoContabilizar };
+    await salvarDados();
+    atualizarModalDetalhesRegistros();
+    renderLista();
+    showToast('Registro editado!','green');
+  };
+  document.getElementById('cancelar-edit').onclick = () => atualizarModalDetalhesRegistros();
+}
+
+// Excluir registro
+async function excluirRegistroModal(nome, idx) {
+  if (!confirm('Excluir este registro?')) return;
+  pessoas[nome].splice(idx, 1);
+  await salvarDados();
+  atualizarModalDetalhesRegistros();
+  renderLista();
+  showToast('Registro excluído!','#b91c1c');
+}
